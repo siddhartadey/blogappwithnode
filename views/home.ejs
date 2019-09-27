@@ -1,0 +1,29 @@
+<% include hf/header %>
+<div class=" jumbotron">
+    <div class="container">
+        <h1>Blog App</h1>
+        <p>Post Your Letest Blog Here...</p>
+        <p><a class="btn btn-success btn-lg" href="/new">Add Post</a></p>
+
+    </div>
+</div>
+</div>
+<div class="container">
+    <div class="row">
+        <% blog.forEach(function(blog) { %>
+
+        <div class="col-sm-6 col-md-3 ">
+            <div class="thumbnail">
+                <img class="img-responsive" src="<%=blog.img%>" alt="...">
+                <div class="caption">
+                    <h3><%=blog.title%></h3>
+                    <p><%=blog.disc.substring(0, 40)%></p>
+                    <p><a href="/post/<%=blog._id%>" class="btn btn-primary">More Info</a></p>
+                </div>
+            </div>
+        </div>
+
+        <%});%>
+    </div>
+</div>
+<% include hf/footer %>

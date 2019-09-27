@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog With node</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        hr.style-eight {
+            overflow: visible;
+            /* For IE */
+            padding: 0;
+            border: none;
+            border-top: medium double #333;
+            color: #333;
+            text-align: center;
+        }
+
+        hr.style-eight:after {
+            content: "§";
+            display: inline-block;
+            position: relative;
+            top: -0.7em;
+            font-size: 1.5em;
+            padding: 0 0.25em;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Blog</a>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <% if(!currentUser){ %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">SingUp</a></li>
+                <% }else{ %>
+                <li><a href="">Welcome <%= currentUser.username %></a></li>
+                <li><a href="/logout">Logout</a></li>
+                <%}%>
+            </ul>
+        </div>
+    </nav>

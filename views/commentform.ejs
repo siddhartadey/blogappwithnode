@@ -1,0 +1,11 @@
+<% include hf/header %>
+<h1 class="text-center">Add Comment</h1>
+<div style="width: 30%;margin: 0 auto;">
+    <form action="/post/<%=post._id%>/comment" method="POST">
+        <div class="form-group">
+            <input class="form-control" type="text" name="comment[text]" placeholder="Comment Text">
+        </div>
+        <button class="btn btn-success">Add</button>
+    </form>
+</div>
+<% include hf/footer %>
