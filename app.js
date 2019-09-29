@@ -19,6 +19,7 @@ app.use(
 		extended: true
 	})
 );
+app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
 // conntect mongodb
 mongoose.connect('mongodb://127.0.0.1:27017/blog', {
@@ -39,12 +40,12 @@ app.use(passport.session());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 passport.use(new localStrategy(User.authenticate()));
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	res.locals.currentUser = req.user;
 	next();
 });
-app.get('/', function(req, res) {
-	Post.find({}, function(err, data) {
+app.get('/', function (req, res) {
+	Post.find({}, function (err, data) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -55,16 +56,21 @@ app.get('/', function(req, res) {
 	});
 });
 
-app.get('/new', isLogged, function(req, res) {
+app.get('/new', isLogged, function (req, res) {
 	res.render('new');
 });
-app.post('/new', isLogged, function(req, res) {
+app.post('/new', isLogged, function (req, res) {
 	var newData = {
 		title: req.body.title,
-		img: req.body.img,
+		img: req.files.img.name,
 		disc: req.body.disc
 	};
-	Post.create(newData, function(err, post) {
+	req.files.img.mv("./public/img/" + req.files.img.name, function (err) {
+		if (err) {
+			console.log(err);
+		}
+	});
+	Post.create(newData, function (err, post) {
 		post.author.id = req.user._id;
 		post.author.username = req.user.username;
 		post.save();
@@ -76,8 +82,8 @@ app.post('/new', isLogged, function(req, res) {
 	});
 });
 // show
-app.get('/post/:id', function(req, res) {
-	Post.findById(req.params.id).populate('comments').exec(function(err, post) {
+app.get('/post/:id', function (req, res) {
+	Post.findById(req.params.id).populate('comments').exec(function (err, post) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -88,8 +94,8 @@ app.get('/post/:id', function(req, res) {
 	});
 });
 // edit
-app.get('/post/:id/edit', postOwnership, function(req, res) {
-	Post.findById(req.params.id, function(err, findpost) {
+app.get('/post/:id/edit', postOwnership, function (req, res) {
+	Post.findById(req.params.id, function (err, findpost) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -100,8 +106,8 @@ app.get('/post/:id/edit', postOwnership, function(req, res) {
 	});
 });
 
-app.put('/post/:id', postOwnership, function(req, res) {
-	Post.findByIdAndUpdate(req.params.id, req.body.post, function(err, post) {
+app.put('/post/:id', postOwnership, function (req, res) {
+	Post.findByIdAndUpdate(req.params.id, req.body.post, function (err, post) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -110,8 +116,8 @@ app.put('/post/:id', postOwnership, function(req, res) {
 	});
 });
 // delete
-app.delete('/post/:id', postOwnership, function(req, res) {
-	Post.findByIdAndRemove(req.params.id, function(err) {
+app.delete('/post/:id', postOwnership, function (req, res) {
+	Post.findByIdAndRemove(req.params.id, function (err) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -121,8 +127,8 @@ app.delete('/post/:id', postOwnership, function(req, res) {
 });
 // comment
 //comment add
-app.get('/post/:id/comment/new', isLogged, function(req, res) {
-	Post.findById(req.params.id, function(err, post) {
+app.get('/post/:id/comment/new', isLogged, function (req, res) {
+	Post.findById(req.params.id, function (err, post) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -133,12 +139,12 @@ app.get('/post/:id/comment/new', isLogged, function(req, res) {
 	});
 });
 
-app.post('/post/:id/comment', isLogged, function(req, res) {
-	Post.findById(req.params.id, function(err, post) {
+app.post('/post/:id/comment', isLogged, function (req, res) {
+	Post.findById(req.params.id, function (err, post) {
 		if (err) {
 			console.log(err);
 		} else {
-			Comment.create(req.body.comment, function(err, comment) {
+			Comment.create(req.body.comment, function (err, comment) {
 				if (err) {
 					console.log(err);
 				} else {
@@ -154,8 +160,8 @@ app.post('/post/:id/comment', isLogged, function(req, res) {
 	});
 });
 //comment edit
-app.get('/post/:id/comment/:comment_id/edit', commentOnwership, function(req, res) {
-	Comment.findById(req.params.comment_id, function(err, comment) {
+app.get('/post/:id/comment/:comment_id/edit', commentOnwership, function (req, res) {
+	Comment.findById(req.params.comment_id, function (err, comment) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -167,8 +173,8 @@ app.get('/post/:id/comment/:comment_id/edit', commentOnwership, function(req, re
 	});
 });
 
-app.put('/post/:id/comment/:comment_id', commentOnwership, function(req, res) {
-	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, comment) {
+app.put('/post/:id/comment/:comment_id', commentOnwership, function (req, res) {
+	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function (err, comment) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -178,8 +184,8 @@ app.put('/post/:id/comment/:comment_id', commentOnwership, function(req, res) {
 });
 
 //delete
-app.delete('/post/:id/comment/:comment_id', commentOnwership, function(req, res) {
-	Comment.findByIdAndRemove(req.params.comment_id, function(err) {
+app.delete('/post/:id/comment/:comment_id', commentOnwership, function (req, res) {
+	Comment.findByIdAndRemove(req.params.comment_id, function (err) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -188,22 +194,22 @@ app.delete('/post/:id/comment/:comment_id', commentOnwership, function(req, res)
 	});
 });
 // aouth route
-app.get('/register', function(req, res) {
+app.get('/register', function (req, res) {
 	res.render('register');
 });
-app.get('/login', function(req, res) {
+app.get('/login', function (req, res) {
 	res.render('login');
 });
 
-app.post('/register', function(req, res) {
+app.post('/register', function (req, res) {
 	var newUser = new User({
 		username: req.body.username
 	});
-	User.register(newUser, req.body.password, function(err, user) {
+	User.register(newUser, req.body.password, function (err, user) {
 		if (err) {
 			console.log(err);
 		} else {
-			passport.authenticate('local')(req, res, function() {
+			passport.authenticate('local')(req, res, function () {
 				res.redirect('/');
 			});
 		}
@@ -215,12 +221,12 @@ app.post(
 		successRedirect: '/',
 		failureRedirect: '/login'
 	}),
-	function(req, res) {}
+	function (req, res) {}
 );
 
 // logout
 
-app.get('/logout', function(req, res) {
+app.get('/logout', function (req, res) {
 	req.logout();
 	res.redirect('/');
 });
@@ -235,7 +241,7 @@ function isLogged(req, res, next) {
 
 function postOwnership(req, res, next) {
 	if (req.isAuthenticated()) {
-		Post.findById(req.params.id, function(err, post) {
+		Post.findById(req.params.id, function (err, post) {
 			if (err) {
 				console.log(err);
 			} else {
@@ -253,7 +259,7 @@ function postOwnership(req, res, next) {
 
 function commentOnwership(req, res, next) {
 	if (req.isAuthenticated()) {
-		Comment.findById(req.params.comment_id, function(err, comment) {
+		Comment.findById(req.params.comment_id, function (err, comment) {
 			if (err) {
 				console.log(err);
 			} else {
@@ -273,6 +279,6 @@ function commentOnwership(req, res, next) {
 var ip = process.env.ip || '127.0.0.1';
 var port = process.env.port || '3000';
 
-app.listen(port, ip, function() {
+app.listen(port, ip, function () {
 	console.log('blog app is started...');
 });
