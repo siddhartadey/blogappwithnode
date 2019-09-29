@@ -22,7 +22,7 @@ app.use(
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
 // conntect mongodb
-mongoose.connect('mongodb://127.0.0.1:27017/blog', {
+mongoose.connect('mongodb+srv://sid:sid@cluster0-didyu.mongodb.net/test?retryWrites=true&w=majority', {
 	useNewUrlParser: true
 });
 // passport config
